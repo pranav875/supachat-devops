@@ -97,7 +97,6 @@ jobs:
     name: Build and Push Images
     runs-on: ubuntu-latest
     needs: test
-    if: false  # Disabled until GHCR_TOKEN secret is configured
     permissions:
       contents: read
       packages: write
@@ -142,7 +141,7 @@ jobs:
     name: Deploy to EC2
     runs-on: ubuntu-latest
     needs: build-push
-    if: false  # Disabled until build-push is enabled and EC2 secrets are configured
+    if: false  # Disabled - enable when EC2 is configured
 
     steps:
       - name: Checkout code
