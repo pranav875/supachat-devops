@@ -41,14 +41,27 @@ jobs:
           cache-dependency-path: backend/requirements.txt
 
       - name: Wait for PostgreSQL
+        env:
+          PGPASSWORD: testpass
         run: |
           until pg_isready -h localhost -p 5432 -U testuser; do
             echo "Waiting for postgres..."
             sleep 2
           done
+          echo "PostgreSQL is ready!"
 
       - name: Install backend dependencies
-        run: pip install -r requirements.txt
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+        working-directory: backend
+
+      - name: Verify installations
+        run: |
+          python -c "import fastapi; print('fastapi OK')"
+          python -c "import asyncpg; print('asyncpg OK')"
+          python -c "import openai; print('openai OK')"
+          python -c "import pytest; print('pytest OK')"
         working-directory: backend
 
       - name: Run backend tests
