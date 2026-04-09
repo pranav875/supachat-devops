@@ -171,7 +171,7 @@ async def test_generate_sql_retry_message_includes_error():
 @pytest.mark.asyncio
 async def test_generate_sql_no_provider_raises():
     """RuntimeError is raised when neither API key is set."""
-    with patch.dict("os.environ", {"OPENAI_API_KEY": "", "ANTHROPIC_API_KEY": ""}):
+    with patch.dict("os.environ", {"OPENAI_API_KEY": "", "ANTHROPIC_API_KEY": "", "GEMINI_API_KEY": "", "GROQ_API_KEY": ""}):
         from app.llm import generate_sql
         with pytest.raises(RuntimeError, match="No LLM provider configured"):
             await generate_sql("test query")
