@@ -40,6 +40,13 @@ jobs:
           cache: pip
           cache-dependency-path: backend/requirements.txt
 
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432 -U testuser; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+
       - name: Install backend dependencies
         run: pip install -r requirements.txt
         working-directory: backend
@@ -47,10 +54,11 @@ jobs:
       - name: Run backend tests
         env:
           DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
-          OPENAI_API_KEY: test-key
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: pytest --tb=short
+          TEST_DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
+          GROQ_API_KEY: test-key
+          SUPABASE_URL: http://test-supabase-url.com
+          SUPABASE_SERVICE_KEY: test-key
+        run: pytest --tb=short -v
         working-directory: backend
 
       - name: Set up Node.js
@@ -149,4 +157,4 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
