@@ -88,7 +88,7 @@ DROP TABLE IF EXISTS articles;
 # Fixtures
 # ---------------------------------------------------------------------------
 
-@pytest_asyncio.fixture(scope="module")
+@pytest_asyncio.fixture(scope="function")
 async def db_pool():
     """Create a real Postgres pool, set up schema, yield, then tear down."""
     try:
