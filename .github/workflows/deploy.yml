@@ -56,14 +56,6 @@ jobs:
           pip install -r requirements.txt
         working-directory: backend
 
-      - name: Verify installations
-        run: |
-          python -c "import fastapi; print('fastapi OK')"
-          python -c "import asyncpg; print('asyncpg OK')"
-          python -c "import openai; print('openai OK')"
-          python -c "import pytest; print('pytest OK')"
-        working-directory: backend
-
       - name: Run backend tests
         env:
           DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
@@ -146,26 +138,152 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd ~/supachat
-            
-            # Log in to GHCR
-            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            
-            # Pull latest images
-            docker-compose pull
-            
-            # Restart services
-            docker-compose up -d
-            
-            # Check status
-            docker-compose ps
-            
-            # Show logs
-            docker-compose logs --tail=50
+      - name: Check EC2 secrets are configured
+        id: check_secrets
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+        run: |
+          if [ -z "$EC2_HOST" ] || [ -z "$EC2_SSH_KEY" ]; then
+            echo "EC2_HOST or EC2_SSH_KEY secret not set — skipping deploy."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up SSH key
+        if: steps.check_secrets.outputs.skip == 'false'
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          # Add EC2 host to known_hosts to avoid interactive prompt
+          ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Prepare deploy script
+        if: steps.check_secrets.outputs.skip == 'false'
+        run: |
+          cat > /tmp/deploy.sh << 'DEPLOY_SCRIPT'
+          #!/bin/bash
+          set -e
+
+          REPO_DIR="$HOME/supachat"
+          GHCR_TOKEN="__GHCR_TOKEN__"
+          GITHUB_ACTOR="__GITHUB_ACTOR__"
+          IMAGE_PREFIX="__IMAGE_PREFIX__"
+          GIT_SHA="__GIT_SHA__"
+
+          echo "==> Logging in to GHCR..."
+          echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+
+          echo "==> Ensuring repo directory exists..."
+          mkdir -p "$REPO_DIR"
+          cd "$REPO_DIR"
+
+          echo "==> Pulling latest images..."
+          docker pull "${IMAGE_PREFIX}/supachat-frontend:latest"
+          docker pull "${IMAGE_PREFIX}/supachat-backend:latest"
+
+          echo "==> Writing docker-compose.yml..."
+          cat > docker-compose.yml << 'EOF'
+          version: "3.9"
+          services:
+            backend:
+              image: __IMAGE_PREFIX__/supachat-backend:latest
+              container_name: supachat-backend
+              restart: unless-stopped
+              env_file: .env
+              environment:
+                HISTORY_DB_PATH: /app/data/supachat_history.db
+              expose:
+                - "8000"
+              volumes:
+                - sqlite_history:/app/data
+              healthcheck:
+                test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+                interval: 30s
+                timeout: 10s
+                retries: 3
+                start_period: 20s
+
+            frontend:
+              image: __IMAGE_PREFIX__/supachat-frontend:latest
+              container_name: supachat-frontend
+              restart: unless-stopped
+              env_file: .env
+              expose:
+                - "3000"
+              depends_on:
+                backend:
+                  condition: service_healthy
+
+            nginx:
+              image: nginx:alpine
+              container_name: supachat-nginx
+              restart: unless-stopped
+              ports:
+                - "80:80"
+              volumes:
+                - ./nginx.conf:/etc/nginx/nginx.conf:ro
+              depends_on:
+                - frontend
+                - backend
+
+          volumes:
+            sqlite_history:
+          EOF
+
+          # Substitute image prefix into compose file
+          sed -i "s|__IMAGE_PREFIX__|${IMAGE_PREFIX}|g" docker-compose.yml
+
+          echo "==> Restarting services..."
+          docker compose up -d --remove-orphans --pull never
+
+          echo "==> Waiting for services to stabilise..."
+          sleep 10
+
+          echo "==> Service status:"
+          docker compose ps
+
+          echo "==> Recent logs:"
+          docker compose logs --tail=30
+
+          echo "==> Deploy complete."
+          DEPLOY_SCRIPT
+
+          # Substitute secrets into the script
+          sed -i "s|__GHCR_TOKEN__|${{ secrets.GHCR_TOKEN }}|g" /tmp/deploy.sh
+          sed -i "s|__GITHUB_ACTOR__|${{ github.actor }}|g" /tmp/deploy.sh
+          sed -i "s|__IMAGE_PREFIX__|${{ env.IMAGE_PREFIX }}|g" /tmp/deploy.sh
+          sed -i "s|__GIT_SHA__|${{ github.sha }}|g" /tmp/deploy.sh
+          chmod +x /tmp/deploy.sh
+
+      - name: Copy nginx config to EC2
+        if: steps.check_secrets.outputs.skip == 'false'
+        run: |
+          scp -i ~/.ssh/deploy_key \
+            -o StrictHostKeyChecking=no \
+            -o ConnectTimeout=30 \
+            nginx/nginx.conf \
+            ec2-user@${{ secrets.EC2_HOST }}:~/supachat/nginx.conf
+
+      - name: Run deploy script on EC2
+        if: steps.check_secrets.outputs.skip == 'false'
+        run: |
+          scp -i ~/.ssh/deploy_key \
+            -o StrictHostKeyChecking=no \
+            -o ConnectTimeout=30 \
+            /tmp/deploy.sh \
+            ec2-user@${{ secrets.EC2_HOST }}:/tmp/deploy.sh
+
+          ssh -i ~/.ssh/deploy_key \
+            -o StrictHostKeyChecking=no \
+            -o ConnectTimeout=30 \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=10 \
+            ec2-user@${{ secrets.EC2_HOST }} \
+            "bash /tmp/deploy.sh && rm /tmp/deploy.sh"
+
+      - name: Clean up SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
