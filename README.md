@@ -22,7 +22,7 @@ graph TD
     Backend["Backend\nFastAPI :8000"]
     MCP["MCP Server\n(in-process)"]
     Supabase["Supabase PostgreSQL\n(external)"]
-    LLM["LLM API\nOpenAI / Anthropic"]
+    LLM["LLM API\nGroq"]
     Prometheus["Prometheus :9090"]
     Grafana["Grafana :3001"]
     Loki["Loki :3100"]
