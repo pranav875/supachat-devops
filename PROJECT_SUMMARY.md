@@ -4,9 +4,9 @@
 
 Your SupaChat application is fully deployed with a professional CI/CD pipeline!
 
-**Application URL:** http://http://65.0.3.65/
+**Application URL:** http://65.0.3.65/
 
-## 📋 Automated CI/CD Pipeline
+##  Automated CI/CD Pipeline
 
 Every push to `main` branch automatically:
 
@@ -14,7 +14,7 @@ Every push to `main` branch automatically:
 2. **Builds Docker Images** (multi-stage optimized)
 3. **Pushes to GitHub Container Registry**
 
-## 🚀Deployment Process
+## Deployment Process
 
 After CI/CD completes successfully, deploy with one command:
 
@@ -53,7 +53,7 @@ Many production environments use this approach because:
 - **Reliability**: No dependency on external CI/CD connectivity
 - **Common Practice**: Used by many Fortune 500 companies
 
-## 📊 Project Metrics
+##  Project Metrics
 
 - **Automation**: 95% (only final deploy step is manual)
 - **Test Coverage**: 77 automated tests
@@ -118,7 +118,7 @@ Included but not yet configured:
 **Database:**
 - Supabase (PostgreSQL)
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 supachat-devops/
@@ -173,7 +173,7 @@ supachat-devops/
    - Elastic IP for stability
    - Docker Compose orchestration
 
-## 📝 Next Steps (Optional)
+##  Next Steps (Optional)
 
 1. **Enable Monitoring:**
    - Configure Grafana dashboards
