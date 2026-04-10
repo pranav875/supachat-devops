@@ -123,8 +123,7 @@ Copy `.env.example` to `.env` and fill in the values below.
 | `DATABASE_URL` | Yes | Postgres connection string, e.g. `postgresql://user:pass@host:5432/db` |
 | `SUPABASE_URL` | Yes | Your Supabase project URL |
 | `SUPABASE_SERVICE_KEY` | Yes | Supabase service role key (bypasses RLS) |
-| `OPENAI_API_KEY` | One of these | OpenAI API key for LLM SQL generation |
-| `ANTHROPIC_API_KEY` | One of these | Anthropic API key (used if `OPENAI_API_KEY` is not set) |
+| `GROQ_API_KEY` | API key for LLM SQL generation |
 | `HISTORY_LIMIT` | No | Max history records returned (default: `50`) |
 | `HISTORY_DB_PATH` | No | SQLite path inside the backend container (default: `/app/data/supachat_history.db`) |
 | `NEXT_PUBLIC_API_URL` | No | API base URL seen by the browser (default: `http://localhost/api`) |
@@ -202,7 +201,7 @@ Go to **Settings → Secrets and variables → Actions** and add:
 | `GHCR_TOKEN` | GitHub personal access token with `write:packages` scope |
 | `SUPABASE_URL` | Supabase project URL |
 | `SUPABASE_SERVICE_KEY` | Supabase service role key |
-| `OPENAI_API_KEY` | OpenAI API key |
+| `GROQ_API_KEY` |  API key |
 
 ---
 
@@ -274,8 +273,4 @@ npm test -- --watchAll=false
 
 ---
 
-## AI Tools Used
 
-- **OpenAI GPT-4o / GPT-4** — natural language to SQL translation, query result summarization
-- **Anthropic Claude** — alternative LLM provider for SQL generation and summarization (selected when `ANTHROPIC_API_KEY` is set and `OPENAI_API_KEY` is not)
-- **Kiro** — AI-assisted IDE used throughout development for code generation, spec creation, and implementation planning
