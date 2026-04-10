@@ -2,13 +2,13 @@
 
 A conversational analytics platform that lets you query a blog analytics database using plain English. Type a question, get back a text summary, a sortable data table, and an interactive chart — all powered by an LLM-to-SQL pipeline backed by Supabase PostgreSQL.
 
-## 🎉 Complete CI/CD Pipeline
+##  Complete CI/CD Pipeline
 
 This project features a fully automated CI/CD pipeline with:
-- ✅ Automated testing (backend + frontend)
-- ✅ Docker image building and pushing to GitHub Container Registry
-- ✅ Automatic deployment to AWS EC2
-- ✅ Monitoring with Grafana, Prometheus, and Loki
+- Automated testing (backend + frontend)
+- Docker image building and pushing to GitHub Container Registry
+- Automatic deployment to AWS EC2
+- Monitoring with Grafana, Prometheus, and Loki
 
 ---
 
