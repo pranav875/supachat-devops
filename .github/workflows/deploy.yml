@@ -183,6 +183,7 @@ jobs:
           echo "==> Pulling latest images..."
           docker pull "${IMAGE_PREFIX}/supachat-frontend:latest"
           docker pull "${IMAGE_PREFIX}/supachat-backend:latest"
+          docker pull nginx:alpine
 
           echo "==> Writing docker-compose.yml..."
           cat > docker-compose.yml << 'EOF'
