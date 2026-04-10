@@ -1,20 +1,20 @@
 # SupaChat DevOps Project - Complete Setup
 
-## 🎉 Project Status: PRODUCTION READY
+##  Project Status: PRODUCTION READY
 
 Your SupaChat application is fully deployed with a professional CI/CD pipeline!
 
-**Application URL:** http://13.205.122.29
+**Application URL:** http://http://65.0.3.65/
 
 ## 📋 Automated CI/CD Pipeline
 
 Every push to `main` branch automatically:
 
-1. ✅ **Runs Tests** (49 backend + 28 frontend tests)
-2. ✅ **Builds Docker Images** (multi-stage optimized)
-3. ✅ **Pushes to GitHub Container Registry**
+1. **Runs Tests** (49 backend + 28 frontend tests)
+2. **Builds Docker Images** (multi-stage optimized)
+3. **Pushes to GitHub Container Registry**
 
-## 🚀 Deployment Process
+## 🚀Deployment Process
 
 After CI/CD completes successfully, deploy with one command:
 
@@ -30,7 +30,7 @@ cd ~/supachat && echo "YOUR_GITHUB_TOKEN" | sudo docker login ghcr.io -u pranav8
 sudo docker-compose ps
 ```
 
-## 🏆 What You've Built
+## What is Built
 
 This is a **production-grade DevOps project** with:
 
@@ -61,7 +61,7 @@ Many production environments use this approach because:
 - **Deployment Time**: ~30 seconds
 - **Cost**: $8-10/month (FREE on AWS free tier)
 
-## 🎯 Skills Demonstrated
+##  Skills Demonstrated
 
 ✅ Docker & Docker Compose
 ✅ CI/CD with GitHub Actions
@@ -78,39 +78,24 @@ Many production environments use this approach because:
 
 **This is a complete, professional DevOps project ready for your portfolio!**
 
-## 📊 Monitoring Stack
+## Monitoring Stack
 
 Included but not yet configured:
 - Grafana (port 3001)
 - Prometheus (port 9090)
 - Loki + Promtail for logs
 
-## 🔐 GitHub Secrets Configured
+##  GitHub Secrets Configured
 
 - ✅ `GHCR_TOKEN` - GitHub Container Registry access
 - ✅ `SUPABASE_URL` - Supabase project URL
 - ✅ `SUPABASE_SERVICE_KEY` - Supabase service key
 - ✅ `GROQ_API_KEY` - Groq LLM API key
-- ✅ `EC2_HOST` - EC2 public IP (13.205.122.29)
+- ✅ `EC2_HOST` - EC2 public IP 
 - ✅ `EC2_SSH_KEY` - SSH private key
 
-## 💰 Cost Management
 
-**Current Cost:** ~$8-10/month (if not on free tier)
-
-**To Save Money:**
-1. Stop EC2 when not in use:
-   - AWS Console → EC2 → Instance state → Stop
-   - Cost when stopped: ~$1-2/month (storage only)
-
-2. Start when needed:
-   - Instance state → Start
-   - Wait 1-2 minutes
-   - Deploy latest images
-
-**Free Tier:** If your AWS account is < 12 months old, this is FREE!
-
-## 🛠️ Tech Stack
+##  Tech Stack
 
 **Frontend:**
 - Next.js 16
@@ -162,7 +147,7 @@ supachat-devops/
 └── README.md               # Project documentation
 ```
 
-## 🎯 Key Features Implemented
+##  Key Features Implemented
 
 1. **Natural Language SQL Queries**
    - Ask questions in plain English
@@ -210,7 +195,7 @@ supachat-devops/
    - Add E2E tests with Playwright
    - Performance testing
 
-## 🏆 What You've Accomplished
+##  What is Accomplished
 
 ✅ Full-stack application development
 ✅ Docker containerization
@@ -222,7 +207,7 @@ supachat-devops/
 ✅ Security best practices
 ✅ Cost optimization strategies
 
-## 📞 Support
+##  Support
 
 **Application Issues:**
 - Check logs: `sudo docker-compose logs`
@@ -237,10 +222,3 @@ supachat-devops/
 - EC2 Console: https://console.aws.amazon.com/ec2/
 - Check instance state, security groups, and Elastic IP
 
----
-
-## 🎊 Congratulations!
-
-You've successfully built and deployed a production-ready application with a complete DevOps pipeline!
-
-**Access your application:** http://13.205.122.29
